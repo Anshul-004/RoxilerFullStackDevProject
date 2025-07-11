@@ -11,6 +11,7 @@ const testRoute = asyncHandler(async(req,res)=>{
 })
 
 const registerUser = asyncHandler(async(req,res)=>{
+    
     const {email, address, name, password} = req.body;
     const role = 'user';
     if(!email || !address || !name || !password){
@@ -27,7 +28,7 @@ const registerUser = asyncHandler(async(req,res)=>{
             throw new ApiError(500,"Database Pool Not Available.")
         }
 
-        //check exisiting users
+        //check existing users
         const[existingUser] = await pool.query('SELECT email,name FROM users WHERE email = ?',[email])
 
         if(existingUser.length > 0){
@@ -35,21 +36,25 @@ const registerUser = asyncHandler(async(req,res)=>{
             throw new ApiError(400, "User Already Exists")
         }
 
-        //enter if not
-        const [result] = await pool.query('INSERT INTO users VALUES (?,?,?,?,?)',[name,address,email,hashedPassword,role]);
-        console.log(result);
-        //get new user
-        // const[newUser] = await pool.query('SELECT id,name,email,address FROM users WHERE id=?',[result.insertId])
+        //enter if not - Insert with all required columns including role
+
+        const [result] = await pool.query(
+            'INSERT INTO users (name, address, email, password, role) VALUES (?, ?, ?, ?, ?)',
+            [name, address, email, hashedPassword, role]
+        );
+        
+        // console.log("Insert result:", result);
+        
+        //get the new user
+        const[newUser] = await pool.query('SELECT id,name,email,address,role,created_at FROM users WHERE id=?',[result.insertId])
 
         return res.status(201)
-        .json(new ApiResponse(200,{},"User Created Successfully"))
+        .json(new ApiResponse(201, newUser[0], "User Created Successfully"))
         
     }catch(error){
         console.log("Error Occured",error);
         throw new ApiError(500,"Something Went Wrong With Database.")
     }
-
-
 })
 
 export {testRoute, registerUser}

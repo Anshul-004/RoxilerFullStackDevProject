@@ -1,4 +1,5 @@
 import mysql from "mysql2/promise";
+import { ApiError } from "../utils/ApiError.js";
 
 let pool;
 
@@ -22,15 +23,16 @@ const connectDB = async () => {
     return pool;
   } catch (err) {
     console.error("Database connection error:", err.message);
-    throw err;
+    throw new ApiError(500,"Database Connection Error")
   }
 };
 
-const getPool = () => {
-  if (!pool) {
-    throw new Error("Database not connected. Call connectDB() first.");
+const getPool = ()=>{
+  if(!pool){
+    console.log("Pool Doesn't Exists, Initialize DB First");
+    return null;
   }
   return pool;
-};
+}
 
-export { connectDB, getPool };
+export { connectDB,getPool };

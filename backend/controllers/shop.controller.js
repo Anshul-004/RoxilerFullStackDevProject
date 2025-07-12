@@ -56,4 +56,27 @@ const getAllShops = asyncHandler(async(req,res)=>{
     }
 })
 
-export {registerShop, getAllShops}
+const getUserShopsAndRatings = asyncHandler(async(req,res)=>{
+    const {id} = req.user;
+    if(!id){
+        throw new ApiError(400,"You Must Be Logged In")
+    }
+
+    const pool = getPool();
+    const [shop] = await pool.query('SELECT id,name FROM stores WHERE owner_id = ?',[id]);
+    
+    if(shop.length<=0){
+        throw new ApiError(404, "No Such Shop Found")
+    }
+
+    const shopName = shop[0].name
+
+    //Who all rated it?
+    const [shopRaters] = await pool.query('SELECT u.name, r.rating FROM ratings r JOIN users u ON r.user_id = u.id WHERE r.store_id = ?',[shop[0].id])
+
+    return res.status(200)
+    .json(new ApiResponse(200,{shopName,shopRaters},"This is the user's shop"))
+
+})
+
+export {registerShop, getAllShops, getUserShopsAndRatings}

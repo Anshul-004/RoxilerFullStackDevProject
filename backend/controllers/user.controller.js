@@ -98,8 +98,19 @@ const loginUser = asyncHandler(async(req,res)=>{
         console.log("Some Error Occured While Logging in",error);
         throw new ApiError(500,"Database Error while logging in")
     }
-    
-
 })
 
-export {testRoute, registerUser, loginUser}
+const logoutUser = asyncHandler((req,res)=>{
+
+    const options ={
+        httpOnly:true,
+        secure:false
+    }
+
+    return res
+    .status(200)
+    .clearCookie('token',options)
+    .json(new ApiResponse(200,{},"User Logged Out"))
+})
+
+export {testRoute, registerUser, loginUser,logoutUser}

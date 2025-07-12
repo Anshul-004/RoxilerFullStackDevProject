@@ -1,11 +1,38 @@
-
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
 export const Card = ({shopData}) => {
   const [rating, setRating] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showRatingInput, setShowRatingInput] = useState(false)
+  const [averageRating, setAverageRating] = useState(0)
+  const [loadingAvgRating, setLoadingAvgRating] = useState(true)
+
+  const fetchAverageRating = async () => {
+    try {
+      setLoadingAvgRating(true)
+      const response = await axios.post('/api/rating/averageRating',{
+        shopId : shopData.id
+      })
+      
+      if (response.status === 200) {
+        // console.log(response)
+        const shopRating = response.data.data?.avg
+        setAverageRating(shopRating|| 0)
+      }
+    } catch (error) {
+      console.error('Error fetching average rating:', error)
+      setAverageRating(0) 
+    } finally {
+      setLoadingAvgRating(false)
+    }
+  }
+
+  useEffect(() => {
+    if (shopData?.id) {
+      fetchAverageRating()
+    }
+  }, [shopData?.id])
 
   const handleAddRating = async () => {
     if (rating === 0) {
@@ -24,6 +51,8 @@ export const Card = ({shopData}) => {
         alert('Rating added successfully!')
         setShowRatingInput(false)
         setRating(0)
+        // Refresh average rating after adding new rating
+        fetchAverageRating()
       }
     } catch (error) {
       console.error('Error adding rating:', error)
@@ -65,7 +94,15 @@ export const Card = ({shopData}) => {
           <p className='text-md text-gray-600'>{shopData.address}</p>
         </div>
         
-        <p className='text-lg font-bold text-amber-700'>Average Rating - 4/5</p>
+        <p className='text-lg font-bold text-amber-700'>
+          {loadingAvgRating ? (
+            'Loading rating...'
+          ) : averageRating > 0 ? (
+            `Average Rating - ${averageRating} / 5`
+          ) : (
+            'No ratings yet'
+          )}
+        </p>
 
         {showRatingInput && (
           <div className="space-y-2">

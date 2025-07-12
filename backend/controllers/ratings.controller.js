@@ -38,4 +38,27 @@ const addRating = asyncHandler(async(req,res)=>{
     }
 })
 
-export {addRating}
+const avgRating = asyncHandler(async(req,res)=>{
+    const {shopId} = req.body;
+    if(!shopId){
+        throw new ApiError(400,"Shop Id is required")
+    }
+
+    try {
+        const pool = getPool();
+        const [averageRate] =await pool.query('SELECT store_id, ROUND(AVG(rating),1) AS avg FROM ratings WHERE store_id=? GROUP BY store_id',[shopId])
+
+        if(averageRate.length<=0){
+            throw new ApiError(400, "No Such ShopId Exists")
+        }
+
+        return res.status(200)
+        .json(new ApiResponse(200,averageRate[0],"Got Averages"))
+        
+    } catch (error) {
+        console.log("Error : ",error);
+        throw new ApiError(500, "Can't Get Avg Ratings")
+    }
+})
+
+export {addRating, avgRating}

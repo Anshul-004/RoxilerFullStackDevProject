@@ -19,8 +19,10 @@ app.use(cookieParser())
 //From Here Onwards we'll redirect the users to Routes files 
 import userRoute from './routes/user.route.js'
 import authRoute from './routes/auth.route.js'
+import shopRoute from './routes/shop.route.js'
 
 app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/shop', shopRoute)
 
 export default app;

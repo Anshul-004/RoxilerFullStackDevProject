@@ -44,8 +44,6 @@ const registerUser = asyncHandler(async(req,res)=>{
             [name, address, email, hashedPassword, role]
         );
         
-        // console.log("Insert result:", result);
-        
         //get the new user
         const[newUser] = await pool.query('SELECT id,name,email,address,role,created_at FROM users WHERE id=?',[result.insertId])
 

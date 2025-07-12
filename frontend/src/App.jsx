@@ -7,6 +7,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import ShopDashboard from './pages/ShopDashboard'
 import AdminDashboard from './pages/AdminDashboard'
+import RegisterShop from './pages/RegisterShop'
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/RegisterShop" element={<RegisterShop />} />
         <Route path="/ShopDashboard" element={<ShopDashboard />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
       </Routes>

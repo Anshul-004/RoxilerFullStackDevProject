@@ -1,6 +1,5 @@
 import React from 'react'
 import { Card } from '../components/Card'
-import { Star, MapPin, Users } from 'lucide-react'
 
 const Home = () => {
   return (

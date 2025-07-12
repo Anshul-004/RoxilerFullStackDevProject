@@ -7,7 +7,7 @@ export const verifyToken = (req,res,next)=>{
     // console.log(token);
 
     if(!token){
-        throw new ApiError(400, "No Existing Session Found")
+        throw new ApiError(401, "No Existing Session Found")
     }
     //token exists :
     try {

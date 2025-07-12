@@ -81,7 +81,7 @@ const loginUser = asyncHandler(async(req,res)=>{
             throw new ApiError(400, "Invalid Password");
         }
         
-        const token = jwt.sign({id:expectedUser[0].id, email:expectedUser[0].email, role:expectedUser[0].role},process.env.JWT_SECRET,{expiresIn: '1d',});
+        const token = jwt.sign({id:expectedUser[0].id,name:expectedUser[0].name, email:expectedUser[0].email, role:expectedUser[0].role},process.env.JWT_SECRET,{expiresIn: '1d',});
     
         const options ={
         httpOnly:true,

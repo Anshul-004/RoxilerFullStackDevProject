@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react'
+import axios from 'axios'
 
 const Login = () => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -42,14 +44,40 @@ const Login = () => {
     return newErrors
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const newErrors = validateForm()
     
     if (Object.keys(newErrors).length === 0) {
-      // Handle login logic here
-      console.log('Login attempt:', formData)
-      // You can add API call here
+      try {
+        console.log('Login attempt:', formData)
+        const response = await axios.post('/api/user/login', {
+          email: formData.email,
+          password: formData.password
+        })
+        
+        console.log('Login successful:', response.data)
+        alert('Login successful!')
+        
+        setFormData({
+          email: '',
+          password: ''
+        })
+        
+        
+        navigate('/')
+        
+      } catch (error) {
+        console.error('Login error:', error)
+        
+        if (error.response?.status === 401) {
+          alert('Invalid email or password')
+        } else if (error.response?.status === 400) {
+          alert(error.response.data.message || 'Login failed')
+        } else {
+          alert('Something went wrong. Please try again.')
+        }
+      }
     } else {
       setErrors(newErrors)
     }

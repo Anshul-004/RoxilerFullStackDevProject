@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, User, MapPin } from 'lucide-react'
+import axios from 'axios'
+
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -60,18 +62,38 @@ const Register = () => {
     const newErrors = validateForm()
     
     if (Object.keys(newErrors).length === 0) {
-      // Handle registration logic here
       console.log('Registration attempt:', formData)
-      // You can add API call here
+      axios.post('/api/user/register',{
+        name:formData.name,
+        email:formData.email,
+        address:formData.address,
+        password:formData.password
+      })
+      .then(()=>{
+        console.log("Posted Data")
+        alert("User Created")
+        setFormData({
+          name:'',
+          email:'',
+          address:'',
+          password:''
+        })
+      })
     } else {
       setErrors(newErrors)
+      setFormData({
+          name:'',
+          email:'',
+          address:'',
+          password:''
+        })
     }
-  }
+}
 
   return (
     <div className="h-screen bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">
-        {/* Header */}
+        
         <div className="text-center mb-6">
           <h2 className="text-3xl font-extrabold text-gray-900">
             Create Account
@@ -82,7 +104,7 @@ const Register = () => {
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="bg-white rounded-lg shadow-lg p-6">
             <div className="space-y-4">
-              {/* Name Field */}
+              
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                   Full Name
@@ -107,7 +129,7 @@ const Register = () => {
                 )}
               </div>
 
-              {/* Email Field */}
+             
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                   Email Address
@@ -132,7 +154,7 @@ const Register = () => {
                 )}
               </div>
 
-              {/* Address Field */}
+              
               <div>
                 <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
                   Address
@@ -157,7 +179,7 @@ const Register = () => {
                 )}
               </div>
 
-              {/* Password Field */}
+            
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                   Password
@@ -193,7 +215,7 @@ const Register = () => {
                 )}
               </div>
 
-              {/* Submit Button */}
+  
               <button
                 type="submit"
                 className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors duration-200"

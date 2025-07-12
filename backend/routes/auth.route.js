@@ -5,6 +5,6 @@ import { meRoute } from "../controllers/auth.controller.js";
 const router = Router();
 
 //Protected Routes
-router.route('/me').post(verifyToken,meRoute)
+router.route('/me').get(verifyToken,meRoute)
 
 export default router;

@@ -20,9 +20,11 @@ app.use(cookieParser())
 import userRoute from './routes/user.route.js'
 import authRoute from './routes/auth.route.js'
 import shopRoute from './routes/shop.route.js'
+import ratingsRoute from './routes/ratings.route.js'
 
 app.use('/api/user', userRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/shop', shopRoute)
+app.use('/api/rating', ratingsRoute)
 
 export default app;

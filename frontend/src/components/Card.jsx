@@ -1,13 +1,13 @@
 import React from 'react'
 
-export const Card = () => {
+export const Card = ({shopData}) => {
 
   return (
     <div className='flex justify-center'>
       <div className='card-body flex flex-col justify-between border-2 p-6 border-amber-600 rounded-2xl w-72 h-64 text-center bg-amber-50 shadow-lg hover:shadow-xl transition-shadow duration-300'>
         <div className='space-y-2'>
-          <p className='text-xl font-bold text-gray-800'>Dukkan ka Naam</p>
-          <p className='text-sm text-gray-600'>69, Lala Lajpat Rai Marg, New Delhi</p>
+          <p className='text-xl font-bold text-gray-800'>{shopData.name}</p>
+          <p className='text-sm text-gray-600'>{shopData.address}</p>
         </div>
         
         <p className='text-lg font-bold text-amber-700'>Rating 4/5</p>

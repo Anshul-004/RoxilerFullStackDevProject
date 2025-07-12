@@ -27,7 +27,8 @@ const registerShop = asyncHandler(async(req,res)=>{
         //No Shop Exists, hence create one.
         const [result] = await pool.query('INSERT INTO stores (name, email, address, owner_id) VALUES (?, ?, ?, ?)',[shopName,email,shopAddress,id]);
 
-        console.log("Shop Created",result);
+        const [updatedUserRole] = await pool.query('UPDATE users SET role = "store_owner" WHERE id = ?',[id]);
+        //JWT Token tobe refreshed and sent again to client when user's meta data changes.
 
         const [newShop] = await pool.query('SELECT name,email,address FROM stores WHERE id=?',[result.insertId])
 
@@ -41,4 +42,18 @@ const registerShop = asyncHandler(async(req,res)=>{
     }
 })
 
-export {registerShop}
+const getAllShops = asyncHandler(async(req,res)=>{
+    try {
+
+        const pool = getPool()
+        const [allShops] = await pool.query('SELECT * FROM stores');
+
+        return res.status(200)
+        .json(new ApiResponse(200, [allShops[0]], "These Are Onboarded Shops"))
+        
+    } catch (error) {
+        
+    }
+})
+
+export {registerShop, getAllShops}

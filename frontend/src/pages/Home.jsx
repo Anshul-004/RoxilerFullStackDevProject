@@ -1,7 +1,32 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card } from '../components/Card'
+import axios from 'axios'
 
 const Home = () => {
+  const [shops, setShops] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    const fetchShops = async () => {
+      try {
+        setLoading(true)
+        const response = await axios.get('/api/shop/getShops')
+        
+        if (response.status === 200) {
+          const shopsData = response.data.data || []
+          setShops(Array.isArray(shopsData) ? shopsData : [shopsData])
+        }
+      } catch (error) {
+        console.error('Error fetching shops:', error)
+        setError('Failed to load shops. Please try again later.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchShops()
+  }, [])
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
       {/* Hero Section */}
@@ -28,7 +53,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Featured Businesses Section */}
       <div className="container mx-auto px-4 py-12">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -39,11 +63,51 @@ const Home = () => {
           </p>
         </div>
         
-        {/* Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          <Card />
-          <Card />
-          <Card />
+          {loading ? (
+            // Loading skeleton
+            <>
+              <div className="bg-white rounded-lg shadow-md p-6 animate-pulse">
+                <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              </div>
+              <div className="bg-white rounded-lg shadow-md p-6 animate-pulse">
+                <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              </div>
+              <div className="bg-white rounded-lg shadow-md p-6 animate-pulse">
+                <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              </div>
+            </>
+          ) : error ? (
+            // Error state
+            <div className="col-span-full text-center py-12">
+              <p className="text-red-600 text-lg">{error}</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="mt-4 px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : !shops || shops.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-600 text-lg">No shops available yet.</p>
+              <p className="text-gray-500 mt-2">Be the first to register your shop!</p>
+            </div>
+          ) : (
+            // Render actual shop cards
+            shops.map((shop) => (
+              <Card 
+                key={shop.id} 
+                shopData={shop}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>

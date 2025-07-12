@@ -2,7 +2,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { getPool } from "../db/connectDB.js";
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 
 const testRoute = asyncHandler(async(req,res)=>{
@@ -57,4 +58,48 @@ const registerUser = asyncHandler(async(req,res)=>{
     }
 })
 
-export {testRoute, registerUser}
+const loginUser = asyncHandler(async(req,res)=>{
+    const {email, password} = req.body;
+    if(!email || !password){
+        throw new ApiError(400,"Both Email & Password Required")
+    }
+    try {
+        const pool = getPool();
+    
+        if(!pool){
+            throw new ApiError(500,"Database Pool Not Available.")
+        }
+        const[expectedUser] = await pool.query('SELECT * FROM users WHERE email=?',[email]);
+        
+        if(!expectedUser){
+            throw new ApiError(400, "No Such User Exists");
+        }
+        //check if expected User's password is equal to our Password
+        const valid = await bcrypt.compare(password,expectedUser[0].password)
+    
+        if(!valid){
+            throw new ApiError(400, "Invalid Password");
+        }
+        
+        const token = jwt.sign({id:expectedUser[0].id, email:expectedUser[0].email, role:expectedUser[0].role},process.env.JWT_SECRET,{expiresIn: '1d',});
+    
+        const options ={
+        httpOnly:true,
+        secure:false
+        }
+
+        return res
+        .status(200)
+        .cookie('token',token,options)
+        .json(new ApiResponse(200,{id:expectedUser[0].id, name:expectedUser[0].name, email:expectedUser[0].email, role:expectedUser[0].role}))
+        
+
+    } catch (error) {
+        console.log("Some Error Occured While Logging in",error);
+        throw new ApiError(500,"Database Error while logging in")
+    }
+    
+
+})
+
+export {testRoute, registerUser, loginUser}

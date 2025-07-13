@@ -78,6 +78,16 @@ export const Navbar = () => {
                     Admin Dashboard
                   </Link>
                 )}
+                {role === "admin" && (
+                  <Link 
+                    to="/register" 
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 transition-colors"
+                    onClick={() => setShowDropdown(false)}
+                  >
+                    <User className="h-4 w-4" />
+                    Register User
+                  </Link>
+                )}
                 {role === "user" && (
                   <Link 
                     to="/RegisterShop" 

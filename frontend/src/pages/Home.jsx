@@ -15,7 +15,16 @@ const Home = () => {
         
         if (response.status === 200) {
           const shopsData = response.data.data || []
-          setShops(Array.isArray(shopsData) ? shopsData : [shopsData])
+          let finalShops = Array.isArray(shopsData) ? shopsData : [shopsData]
+          
+          // Flatten nested arrays if backend returns nested structure
+          if (finalShops.length > 0 && Array.isArray(finalShops[0])) {
+            finalShops = finalShops.flat()
+          }
+          
+          console.log('Processed shops data:', finalShops)
+          console.log('Number of shops:', finalShops.length)
+          setShops(finalShops)
         }
       } catch (error) {
         console.error('Error fetching shops:', error)

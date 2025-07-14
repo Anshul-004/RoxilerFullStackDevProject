@@ -49,7 +49,7 @@ const getAllShops = asyncHandler(async(req,res)=>{
         const [allShops] = await pool.query('SELECT * FROM stores');
 
         return res.status(200)
-        .json(new ApiResponse(200, [allShops[0]], "These Are Onboarded Shops"))
+        .json(new ApiResponse(200, [allShops], "These Are Onboarded Shops"))
         
     } catch (error) {
         

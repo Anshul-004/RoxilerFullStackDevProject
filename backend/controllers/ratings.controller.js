@@ -14,17 +14,20 @@ const addRating = asyncHandler(async(req,res)=>{
     try {
         const pool = getPool();
         
-        const [pRate] = await pool.query('SELECT * FROM ratings WHERE user_id=?',[id]);
+        // Check if user has already rated this specific shop
+        const [pRate] = await pool.query('SELECT * FROM ratings WHERE user_id=? AND store_id=?',[id, shopId]);
 
-        if(pRate.length>0){
-            //Update rating if already exists
+        if(pRate.length > 0){
+            // Update rating if already exists for this shop
             const [updRate] = await pool.query('UPDATE ratings SET rating=? WHERE user_id=? AND store_id=?',[rating,id,shopId])
-            // console.log(pRate[0]);
+            
             const [updVals] = await pool.query('SELECT user_id, store_id, rating FROM ratings WHERE id=?',[pRate[0].id]);
-            // console.log(updVals);
-            return res.status(204);
+            
+            return res.status(200)
+            .json(new ApiResponse(200,updVals[0],"Rating Updated Successfully"));
         }
 
+        // Create new rating
         const [nRate] = await pool.query('INSERT INTO ratings (user_id, store_id, rating) VALUES (?,?,?)',[id,shopId,rating]);
 
         const [newRating] = await pool.query('SELECT user_id, store_id, rating FROM ratings WHERE id=?',[nRate.insertId])
@@ -46,10 +49,12 @@ const avgRating = asyncHandler(async(req,res)=>{
 
     try {
         const pool = getPool();
-        const [averageRate] =await pool.query('SELECT store_id, ROUND(AVG(rating),1) AS avg FROM ratings WHERE store_id=? GROUP BY store_id',[shopId])
+        const [averageRate] = await pool.query('SELECT store_id, ROUND(AVG(rating),1) AS avg FROM ratings WHERE store_id=? GROUP BY store_id',[shopId])
 
-        if(averageRate.length<=0){
-            throw new ApiError(400, "No Such ShopId Exists")
+        if(averageRate.length === 0){
+            // No ratings exist for this shop, return default values
+            return res.status(200)
+            .json(new ApiResponse(200, {store_id: shopId, avg: 0}, "No ratings found for this shop"))
         }
 
         return res.status(200)

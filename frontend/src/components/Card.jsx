@@ -16,9 +16,8 @@ export const Card = ({shopData}) => {
       })
       
       if (response.status === 200) {
-        // console.log(response)
-        const shopRating = response.data.data?.avg
-        setAverageRating(shopRating|| 0)
+        const shopRating = response.data.data?.avg || 0
+        setAverageRating(shopRating)
       }
     } catch (error) {
       console.error('Error fetching average rating:', error)
@@ -47,12 +46,13 @@ export const Card = ({shopData}) => {
         shopId: shopData.id
       })
       
-      if (response.status === 200 || response.status === 204) {
-        alert('Rating added successfully!')
+      if (response.status === 200) {
+        const message = response.data.message || 'Rating added successfully!'
+        alert(message)
         setShowRatingInput(false)
         setRating(0)
-        // Refresh average rating after adding new rating
-        fetchAverageRating()
+        // Refresh average rating after adding/updating rating
+        await fetchAverageRating()
       }
     } catch (error) {
       console.error('Error adding rating:', error)
